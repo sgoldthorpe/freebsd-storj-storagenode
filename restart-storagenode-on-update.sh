@@ -1,40 +1,63 @@
 #!/usr/bin/env bash
 
-STORAGENODE_SERVICE=storagenode
+VERBOSE=0
+SN_SERVICE=storagenode
 SUPERVISORCTL=/usr/local/bin/supervisorctl
-STORAGENODE_BINDIR=/home/storj/bin
-STORAGENODE_BIN="${STORAGENODE_BINDIR}/storagenode"
-STORAGENODE_LATEST="${STORAGENODE_BINDIR}/storagenode-latest"
+SN_BINDIR=$HOME/bin
+SN_BIN="${SN_BINDIR}/storagenode"
+SN_LATEST="${SN_BINDIR}/storagenode-latest"
 USE_SUDO=sudo
+SCNAME="`basename \"$0\"`"
 
-if [ ! -x $STORAGENODE_LATEST -o ! -x $STORAGENODE_BIN ]; then
-        echo "$0: Can't find existing or latest storagenode binary, exiting..."
-        exit 1
+# FUNCS
+
+err() {
+        EXNO=$1
+        shift
+        echo "${SCNAME}: $*" >&2
+        rm -f "$TMPDIR"/*; rmdir "$TMPDIR"
+        exit $EXNO
+}
+
+msg() {
+        test $VERBOSE -gt 0 && echo "$*"
+}
+
+# check args
+if [ "x$1" = "x-v" ]; then
+	VERBOSE=1
 fi
 
-LV="`$STORAGENODE_LATEST version`"
-EV="`$STORAGENODE_BIN version`"
+if [ ! -x $SN_LATEST -o ! -x $SN_BIN ]; then
+        err 1 "Can't find existing or latest storagenode binary, exiting..."
+fi
 
-if [ "$LV" = "$EV" ]; then
-        echo "$0: Versions are same - nothing to do, exiting..."
+if cmp -s $SN_BIN $SN_LATEST; then
+        msg "$SN_BIN and $SN_LATEST are same - nothing to do, exiting..."
         exit 0
 fi
 
-$USE_SUDO $SUPERVISORCTL status $STORAGENODE_SERVICE >/dev/null 2>&1
+msg "$SN_BIN is different to $SN_LATEST"
+
+$USE_SUDO $SUPERVISORCTL status $SN_SERVICE >/dev/null 2>&1
 if [ $? -ne 0 -a $? -ne 3 ]; then
-        echo "$0: Issue getting status of storagenode service exiting..."
-        exit 1
+        err 1 "Issue getting status of storagenode service exiting..."
 fi
 
-NODE_PID="`$USE_SUDO $SUPERVISORCTL pid $STORAGENODE_SERVICE`"
+NODE_PID="`$USE_SUDO $SUPERVISORCTL pid $SN_SERVICE`"
 if [ $? -ne 0 ]; then
-        STORAGENODE_WAS_RUNNING=0
+        SN_WAS_RUNNING=0
 else
-        STORAGENODE_WAS_RUNNING=1
-        $USE_SUDO $SUPERVISORCTL stop $STORAGENODE_SERVICE
+        SN_WAS_RUNNING=1
+	msg "Stopping Service..."
+        $USE_SUDO $SUPERVISORCTL stop $SN_SERVICE
 fi
-cp -p $STORAGENODE_LATEST $STORAGENODE_BIN
-if [ $STORAGENODE_WAS_RUNNING -eq 1 ]; then
-        $USE_SUDO $SUPERVISORCTL start $STORAGENODE_SERVICE
+
+msg "Copying $SN_LATEST to $SN_BIN..."
+cp -p $SN_LATEST $SN_BIN
+
+if [ $SN_WAS_RUNNING -ne 0 ]; then
+	msg "Restarting Service."
+        $USE_SUDO $SUPERVISORCTL start $SN_SERVICE
 fi
 exit 0
