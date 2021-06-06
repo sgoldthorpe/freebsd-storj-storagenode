@@ -21,7 +21,7 @@ Usage:
 
 Script to check if `$HOME/bin/storagenode` and `$HOME/bin/storagenode-latest`
 differ if so, stop the supervisor storagenode service, copy
-$HOME/bin/storagenode-latest` to `$HOME/bin/storagenode` and restart the
+`$HOME/bin/storagenode-latest` to `$HOME/bin/storagenode` and restart the
 service if it was originally running.
 
 package requirements:
