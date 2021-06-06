@@ -1,0 +1,14 @@
+/var/log/storj/node.log {
+    daily
+    su storj storj
+    rotate 366
+    copytruncate
+    notifempty
+    missingok
+    dateext
+    extension .log
+    dateyesterday
+    compress
+    compresscmd xz
+    delaycompress
+}
