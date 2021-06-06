@@ -6,6 +6,7 @@ SN_BIN=storagenode
 SN_BIN_LATEST="${SN_BIN}-latest"
 VERSION_URL=https://version.storj.io
 LATEST_BASEURL="https://github.com/storj/storj/releases/latest/download"
+SCNAME="`basename \"$0\"`"
 
 # FUNCS
 
@@ -69,15 +70,12 @@ fetch_and_version() {
 }
 
 # create temporary working directory
-SCNAME="`basename \"$0\"`"
 TMPDIR="`mktemp -d \"/tmp/${SCNAME}.XXXXXX\"`"
-
 if [ $? -ne 0 ]; then
 	err 1 "Can't create temp directory, exiting..."
 fi
 
-# CHECK ARGS
-
+# check args
 if [ "x$1" = "x-v" ]; then
 	VERBOSE=1
 fi
