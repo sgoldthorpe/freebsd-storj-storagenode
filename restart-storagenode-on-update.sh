@@ -15,7 +15,6 @@ err() {
         EXNO=$1
         shift
         echo "${SCNAME}: $*" >&2
-        rm -f "$TMPDIR"/*; rmdir "$TMPDIR"
         exit $EXNO
 }
 
