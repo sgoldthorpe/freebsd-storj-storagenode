@@ -1,5 +1,6 @@
 # freebsd-storj-storagenode
-Setup and Helper scripts for running Storj Storage Nodes on FreeBSD
+Setup and Helper scripts for running Storj Storage Nodes on FreeBSD.
+THIS IS USER CONTRIBUTED CODE AND IS IN NO WAY ASSOCIATED WITH STORJ LABS INC.
 
 **update-storagenode.sh**
 
